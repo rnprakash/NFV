@@ -26,6 +26,7 @@ public:
 	Packet(const Packet&);
 	friend void swap(Packet&, Packet&);
 	Packet& operator=(Packet);
+    friend std::ostream& operator<<(std::ostream&, const Packet&);
 	Packet(Packet&&);
 	void append_item(bool);
 	void append_item(int);

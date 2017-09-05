@@ -317,3 +317,11 @@ struct ip* Packet::allocate_ip_hdr_mem(int len) {
 Packet::~Packet() {	
 	free(data);
 }
+
+std::ostream& operator<< (std::ostream &strm, const Packet &pkt)
+{
+    string data;
+    for(int i; i < pkt.data_len; i++)
+        data += pkt.data[i];
+    return strm << "Packet: " << data;
+}
